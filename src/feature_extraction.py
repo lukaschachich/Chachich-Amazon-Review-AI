@@ -21,6 +21,18 @@ def extract_features(df, include_pos=False):
     df["punctuation_ct"] = df["cleaned_text"].apply(lambda s: sum(1 for ch in s if ch in string.punctuation)) # count punctuation characters
 
     df["is_extreme_star"] = df["rating"].isin([1.0, 5.0]) # True if rating is 1 or 5
+    
+    # Average word length
+    df['avg_word_len'] = df['cleaned_text'].apply(
+        lambda x: sum(len(word) for word in x.split()) / max(1, len(x.split()))
+    )
+    # Explanation: sum of word lengths divided by number of words (avoid division by 0)
+
+    # Uppercase word ratio
+    df['uppercase_ratio'] = df['cleaned_text'].apply(
+        lambda x: sum(1 for word in x.split() if word.isupper()) / max(1, len(x.split()))
+    )
+    # Explanation: counts fully uppercase words and divides by total words
 
     # Optionally add POS features
     if include_pos:
@@ -34,7 +46,7 @@ def extract_features(df, include_pos=False):
 
 nlp = spacy.load("en_core_web_sm", disable=['parser','ner'])  # Load the small English model from spaCy
 
-POS_WHITELIST = {"VERB", "NOUN", "ADV"} # Set of POS tags we want to count
+POS_WHITELIST = {"VERB", "NOUN", "ADV", "ADJ", "PRON", "PROPN", "DET"} # Set of POS tags we want to count
 
 def pos_counts(text): # Function to count POS in a given text
     doc = nlp(text)  # tokenizes the text
@@ -46,7 +58,7 @@ def pos_counts(text): # Function to count POS in a given text
 # Add POS features to dataframe
 
 def add_pos_features(df): 
-    pos_data = df["cleaned_text"].apply(pos_counts)
+    pos_data = df["cleaned_text"].apply(pos_counts) # apply pos_counts to each row in the cleaned_text column
     pos_df = pd.DataFrame(list(pos_data)).fillna(0)  # fill null counts with 0
     pos_df.index = df.index  # align columns with original df (dataframe)
-    return pd.concat([df, pos_df], axis=1)
+    return pd.concat([df, pos_df], axis=1) # concatenate the new POS columns to the original dataframe
