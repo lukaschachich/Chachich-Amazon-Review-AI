@@ -29,7 +29,7 @@ def extract_features(df, include_pos=False):
     # Explanation: sum of word lengths divided by number of words (avoid division by 0)
 
     # Uppercase word ratio
-    df['uppercase_ratio'] = df['cleaned_text'].apply(
+    df['uppercase_ratio'] = df['text_'].astype(str).apply(
         lambda x: sum(1 for word in x.split() if word.isupper()) / max(1, len(x.split()))
     )
     # Explanation: counts fully uppercase words and divides by total words
@@ -46,7 +46,7 @@ def extract_features(df, include_pos=False):
 
 nlp = spacy.load("en_core_web_sm", disable=['parser','ner'])  # Load the small English model from spaCy
 
-POS_WHITELIST = {"VERB", "NOUN", "ADV", "ADJ", "PRON", "PROPN", "DET"} # Set of POS tags we want to count
+POS_WHITELIST = {"VERB", "NOUN", "ADV", "ADJ", "PRON", "DET"} # Set of POS tags we want to count
 
 def pos_counts(text): # Function to count POS in a given text
     doc = nlp(text)  # tokenizes the text
