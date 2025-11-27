@@ -35,7 +35,7 @@ print(y.value_counts()) # Check the distribution of labels, to check if CG and O
 
 
 # Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=2) # random_state is basically like a seed for the random number generator, so you get the same split every time
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=2) # random_state is basically like a seed for the random number generator, so you get the same split every time
 
 print(X_train.shape, X_test.shape) # Check the shape of the training and testing sets
 
