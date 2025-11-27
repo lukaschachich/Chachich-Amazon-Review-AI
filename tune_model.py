@@ -38,7 +38,7 @@ y = df["label"].map(label_map)
 # create train/test split (use stratify to preserve class balance)
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=2, stratify=y # stratify=y to maintain class distribution which is important for imbalanced datasets
+    X, y, test_size=0.2, random_state=41, stratify=y # stratify=y to maintain class distribution which is important for imbalanced datasets
 )
 
 
@@ -64,18 +64,20 @@ plt.show() # Show the plot
 
 # Parameter grid for hyperparameter tuning, it will adjust the model to find the best parameters
 parameters = {
-    "n_estimators": [50, 100, 200, 500], # Number of trees in the forest
-    "learning_rate": [0.1, 0.3, 0.6, 1.0], # Step size shrinkage used in update to prevent overfitting
-    "max_depth": [2, 3, 4, 8], # Maximum depth of a tree
-    "reg_alpha": [0.0, 0.1, 0.5, 1.0], # L1 regularization term on weights which can help with feature selection
-    "reg_lambda": [0.1, 0.5, 1.0, 1.5], # L2 regularization term on weights
+    "n_estimators": [200, 400, 600],
+    "learning_rate": [0.01, 0.05, 0.1],
+    "max_depth": [3, 4, 5],
+    "subsample": [0.8, 1.0],
+    "colsample_bytree": [0.8, 1.0],
+    "reg_alpha": [0, 0.1, 0.5],
+    "reg_lambda": [1, 1.5, 2.0]
 }
 
 # The model to be used in GridSearchCV
 xgb_model = XGBClassifier( 
     use_label_encoder=False, # To avoid warning about label encoding
     eval_metric="logloss", # Evaluation metric for the model
-    random_state=2, # For reproducibility
+    random_state=41, # For reproducibility
 )
 
 
@@ -127,7 +129,7 @@ print(selected_features.tolist())
 
 # Retrain a new XGBClassifier using the best hyperparameters found by grid search
 # best_params is defined above from grid_search.best_params_
-xgb_selected = XGBClassifier(**best_params, use_label_encoder=False, eval_metric="logloss", random_state=2)
+xgb_selected = XGBClassifier(**best_params, use_label_encoder=False, eval_metric="logloss", random_state=41)
 xgb_selected.fit(select_X_train, y_train)
 
 # Evaluate the selected-features model on the test set
